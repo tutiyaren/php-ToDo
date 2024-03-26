@@ -12,7 +12,7 @@
     <?php include '../header/header.php'; ?>
 
     <div>
-        <!-- タスク追加 -->
+        <!-- タスク編集 -->
         <form action="../../process/task/update.php" method="POST" style="display: flex;">
             <div>
                 <select name="name" id="">
