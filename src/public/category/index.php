@@ -22,8 +22,8 @@
         </form>
 
         <!-- カテゴリー一覧 -->
-        <!-- foreach -->
         <div style="display: flex;">
+        <!-- foreach -->
             <div style="display: flex;">
                 <div>
                     <p>各カテゴリー名</p>
