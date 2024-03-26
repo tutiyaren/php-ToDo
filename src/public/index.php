@@ -72,7 +72,7 @@
                 <td>2024-12-30</td>
                 <td>カテゴリー1</td>
                 <td>
-                    <form action="task/updateStatus.php" method="POST">
+                    <form action="../process/task/updateStatus.php" method="POST">
                         <button type="submit" name="">完了 or 未完了</button>
                     </form>
                 </td>
@@ -80,7 +80,7 @@
                     <a href="task/edit.php">編集</a>
                 </td>
                 <td>
-                    <form action="task/delete.php" method="POST">
+                    <form action="../process/task/delete.php" method="POST">
                         <button type="submit" name="">削除</button>
                     </form>
                 </td>
