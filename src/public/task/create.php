@@ -17,9 +17,9 @@
             <a href="../category/index.php">カテゴリを追加</a>
         </div>
         <!-- タスク追加 -->
-        <form action="../../process/task/store.php" style="display: flex;">
+        <form action="../../process/task/store.php" method="POST" style="display: flex;">
             <div>
-                <select name="" id="">
+                <select name="name" id="">
                     <option value="" disabled selected style="display:none;">カテゴリを選んでください</option>
                     <option value="">カテゴリ1</option>
                 </select>

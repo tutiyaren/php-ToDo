@@ -29,7 +29,7 @@
                         </div>
                     </div>
                     <div>
-                        <select name="" id="">
+                        <select name="name" id="">
                             <option value="" disabled selected style="display:none;">カテゴリ</option>
                             <option value="">1</option>
                         </select>
