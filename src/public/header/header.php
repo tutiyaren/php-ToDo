@@ -1,8 +1,4 @@
 <?php
-$userId = null;
-if (isset($_SESSION['id'])) {
-    $userId = $_SESSION['id'];
-}
 
 ?>
 
