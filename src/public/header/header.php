@@ -1,5 +1,10 @@
+<?php
+$userId = null;
+if (isset($_SESSION['id'])) {
+    $userId = $_SESSION['id'];
+}
 
-
+?>
 
 <header>
     <div style="display: flex;">
@@ -12,7 +17,7 @@
             <ol style="width: 100%; display: flex; justify-content: space-around;">
                 <list><a href="../index.php">ホーム</a></list>
                 <list><a href="category/index.php">カテゴリー</a></list>
-                <form action="user/logout.php" method="post">
+                <form action="../process/user/logout.php" method="post">
                     <button type="submit">ログアウト</button>
                 </form>
             </ol>
