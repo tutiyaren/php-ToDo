@@ -53,7 +53,7 @@ $allCategories = $categoryModel->getCategories();
                         <p><?php echo $allCategory['name'] ?></p>
                     </div>
                     <div style="line-height: 55px;">
-                        <a href="edit.php">編集</a>
+                        <a href="edit.php?id=<?php echo $allCategory['id']; ?>">編集</a>
                     </div>
                     <div>
                         <form action="../../process/category/delete.php" method="POST" style="line-height: 55px;">
