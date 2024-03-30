@@ -6,6 +6,7 @@ interface categoryInterface
 {
     public static function validateCategory(): string;
     public function addCategory($userId, $name): void;
+    public function getCategories();
 }
 
 abstract class AbstractCategory implements categoryInterface
@@ -39,5 +40,11 @@ class Category extends AbstractCategory
         $smt->bindParam(':created_at', $created_at);
         $smt->bindParam(':updated_at', $updated_at);
         $smt->execute();
+    }
+
+    public function getCategories()
+    {
+        $smt = $this->pdo->query('SELECT * FROM categories');
+        return $smt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

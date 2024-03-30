@@ -15,5 +15,5 @@ $categoyModel = new Category($pdo);
 $createCategory = $categoyModel->addCategory($userId, $name);
 if($createCategory !== false) {
     header('Location: /../category/index.php');
+    exit();
 }
-

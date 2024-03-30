@@ -1,11 +1,19 @@
 <?php
 require_once '../common/auth.php';
+require '../../app/Categories.php';
+use App\Category;
+$pdo = new PDO('mysql:host=mysql;dbname=todo', 'root', 'password');
 
 $errorCategoryAdd = "";
 if(isset($_SESSION['errorCategoryAdd'])) {
     $errorCategoryAdd = $_SESSION['errorCategoryAdd'];
-     unset($_SESSION['errorCategoryAdd']);
+    unset($_SESSION['errorCategoryAdd']);
 }
+
+$categoryModel = new Category($pdo);
+$allCategories = $categoryModel->getCategories();
+
+
 
 ?>
 
@@ -32,19 +40,23 @@ if(isset($_SESSION['errorCategoryAdd'])) {
         </form>
 
         <!-- カテゴリー一覧 -->
-        <div style="display: flex;">
-        <!-- foreach -->
-            <div style="display: flex;">
-                <div>
-                    <p>各カテゴリー名</p>
+        <div>
+            <?php foreach($allCategories as $allCategory): ?>
+                <div style="display: flex;">
+                    <div>
+                        <p><?php echo $allCategory['name'] ?></p>
+                    </div>
+                    <div style="line-height: 55px;">
+                        <a href="edit.php">編集</a>
+                    </div>
+                    <div>
+                        <form action="../../process/category/delete.php" method="POST" style="line-height: 55px;">
+                            <!-- <input type="hidden" name="category_id" value="<?php echo $allCategory['id']; ?>"> -->
+                            <button type="submit" name="delete">削除</button>
+                        </form>
+                    </div>
                 </div>
-                <div style="line-height: 55px;">
-                    <a href="edit.php">編集</a>
-                </div>
-            </div>
-            <form action="../../process/category/delete.php" method="POST" style="line-height: 50px;">
-                <button type="" name="">削除</button>
-            </form>
+            <?php endforeach; ?>
         </div>
 
         <!-- タスク作成リンク -->
