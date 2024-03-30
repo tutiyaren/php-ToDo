@@ -6,6 +6,8 @@ interface taskInterface
 {
     public static function validateTask();
     public function addTask($userId, $categoryId, $status, $contents, $deadline): void;
+    public function getTasks($userId);
+    public function toggleStatus($newStatus, $taskId);
 }
 
 abstract class AbstractTask implements taskInterface
@@ -54,5 +56,20 @@ class Task extends AbstractTask
         $smt->bindParam(':created_at', $created_at);
         $smt->bindParam(':updated_at', $updated_at);
         $smt->execute();
+    }
+
+    public function getTasks($userId)
+    {
+        $smt = $this->pdo->prepare('SELECT * FROM tasks WHERE user_id = :user_id');
+        $smt->execute([':user_id' => $userId]);
+        return $smt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function toggleStatus($newStatus, $taskId)
+    {
+        $stmt = $this->pdo->prepare('UPDATE tasks SET status = :status WHERE id = :id');
+        $stmt->execute([':status' => $newStatus, ':id' => $taskId]);
+        header('Location: /index.php');
+        exit();
     }
 }

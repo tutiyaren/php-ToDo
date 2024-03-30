@@ -6,7 +6,7 @@ interface categoryInterface
 {
     public static function validateCategory(): string;
     public function addCategory($userId, $name): void;
-    public function getCategories();
+    public function getCategories($userId);
     public function getCategory($categoryId);
     public function deleteCategory($category_id);
     public function updateCategory($category_id, $name);
@@ -45,9 +45,10 @@ class Category extends AbstractCategory
         $smt->execute();
     }
 
-    public function getCategories()
+    public function getCategories($userId)
     {
-        $smt = $this->pdo->query('SELECT * FROM categories');
+        $smt = $this->pdo->prepare('SELECT * FROM categories WHERE user_id = :user_id');
+        $smt->execute([':user_id' => $userId]);
         return $smt->fetchAll(PDO::FETCH_ASSOC);
     }
 

@@ -17,7 +17,7 @@ if(isset($_SESSION['errorDeleteCategory'])) {
 }
 
 $categoryModel = new Category($pdo);
-$allCategories = $categoryModel->getCategories();
+$allCategories = $categoryModel->getCategories($userId);
 
 
 
