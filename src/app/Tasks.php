@@ -8,6 +8,9 @@ interface taskInterface
     public function addTask($userId, $categoryId, $status, $contents, $deadline): void;
     public function getTasks($userId);
     public function toggleStatus($newStatus, $taskId);
+    public function deleteTask($task_id);
+    public function getTask($taskId);
+    public function updateTask($task_id, $category_id, $contents, $deadline);
 }
 
 abstract class AbstractTask implements taskInterface
@@ -71,5 +74,25 @@ class Task extends AbstractTask
         $stmt->execute([':status' => $newStatus, ':id' => $taskId]);
         header('Location: /index.php');
         exit();
+    }
+
+    public function deleteTask($task_id)
+    {
+        $smt = $this->pdo->prepare('DELETE FROM tasks WHERE id = :id');
+        $smt->execute(array(':id' => $task_id));
+    }
+
+    public function getTask($taskId)
+    {
+        $smt = $this->pdo->prepare('SELECT * FROM tasks WHERE id = :id');
+        $smt->execute(['id' => $taskId]);
+        $task = $smt->fetch(PDO::FETCH_ASSOC);
+        return $task;
+    }
+
+    public function updateTask($task_id, $category_id, $contents, $deadline)
+    {
+        $smt = $this->pdo->prepare('UPDATE tasks SET category_id = :category_id, contents = :contents, deadline = :deadline WHERE id = :id');
+        $smt->execute(array(':id' => $task_id, ':category_id' => $category_id, ':contents' => $contents, ':deadline' => $deadline));
     }
 }

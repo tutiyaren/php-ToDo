@@ -4,10 +4,10 @@ require '../app/Tasks.php';
 use App\Task;
 $pdo = new PDO('mysql:host=mysql;dbname=todo', 'root', 'password');
 
-$errorCategoryDelete = "";
-if(isset($_SESSION['errorDeleteCategory'])) {
-    $errorCategoryDelete = $_SESSION['errorDeleteCategory'];
-    unset($_SESSION['errorDeleteCategory']);
+$errorTaskDelete = "";
+if(isset($_SESSION['errorDeleteTask'])) {
+    $errorTaskDelete = $_SESSION['errorDeleteTask'];
+    unset($_SESSION['errorDeleteTask']);
 }
 
 $taskModel = new Task($pdo);
@@ -68,7 +68,7 @@ $allTasks = $taskModel->getTasks($userId);
 
         <!-- タスク追加 -->
         <div>
-            <a href="task/create.php">タスクを追加</a>
+            <a href="/task/create.php">タスクを追加</a>
         </div>
 
         <!-- タスク一覧 -->
@@ -104,16 +104,20 @@ $allTasks = $taskModel->getTasks($userId);
                         </form>
                     </td>
                     <td>
-                        <a href="task/edit.php">編集</a>
+                        <a href="task/edit.php?id=<?php echo $allTask['id']; ?>">編集</a>
                     </td>
                     <td>
                         <form action="../process/task/delete.php" method="POST">
-                            <button type="submit" name="">削除</button>
+                            <input type="hidden" name="task_id" value="<?php echo $allTask['id']; ?>">
+                            <button type="submit" name="delete">削除</button>
                         </form>
                     </td>
                 </tr>
             <?php endforeach; ?>
         </table>
+        <div>
+            <?php echo $errorTaskDelete ?>
+        </div>
 
     </div>
     

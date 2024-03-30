@@ -5,7 +5,7 @@ use App\Category;
 $pdo = new PDO('mysql:host=mysql;dbname=todo', 'root', 'password');
 
 $categoryModel = new Category($pdo);
-$allCategories = $categoryModel->getCategories();
+$allCategories = $categoryModel->getCategories($userId);
 $categoryNames = "";
 
 $errorTaskAdd = "";
