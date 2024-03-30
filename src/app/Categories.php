@@ -47,4 +47,18 @@ class Category extends AbstractCategory
         $smt = $this->pdo->query('SELECT * FROM categories');
         return $smt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function deleteCategory($category_id)
+    {
+        $taskCountQuery = $this->pdo->prepare('SELECT COUNT(*) FROM tasks WHERE category_id = :category_id');
+        $taskCountQuery->execute(array(':category_id' => $category_id));
+        $taskCount = $taskCountQuery->fetchColumn();
+        if ($taskCount > 0) {
+            $_SESSION['errorDeleteCategory'] = '現在タスクで使用されているので削除できません';
+            return;
+        }
+
+        $smt = $this->pdo->prepare('DELETE FROM categories WHERE id = :id');
+        $smt->execute(array(':id' => $category_id));
+    }
 }

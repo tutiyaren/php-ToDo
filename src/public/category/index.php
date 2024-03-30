@@ -10,6 +10,12 @@ if(isset($_SESSION['errorCategoryAdd'])) {
     unset($_SESSION['errorCategoryAdd']);
 }
 
+$errorCategoryDelete = "";
+if(isset($_SESSION['errorDeleteCategory'])) {
+    $errorCategoryDelete = $_SESSION['errorDeleteCategory'];
+    unset($_SESSION['errorDeleteCategory']);
+}
+
 $categoryModel = new Category($pdo);
 $allCategories = $categoryModel->getCategories();
 
@@ -51,12 +57,15 @@ $allCategories = $categoryModel->getCategories();
                     </div>
                     <div>
                         <form action="../../process/category/delete.php" method="POST" style="line-height: 55px;">
-                            <!-- <input type="hidden" name="category_id" value="<?php echo $allCategory['id']; ?>"> -->
+                            <input type="hidden" name="category_id" value="<?php echo $allCategory['id']; ?>">
                             <button type="submit" name="delete">削除</button>
                         </form>
                     </div>
                 </div>
             <?php endforeach; ?>
+        </div>
+        <div>
+            <?php echo $errorCategoryDelete ?>
         </div>
 
         <!-- タスク作成リンク -->

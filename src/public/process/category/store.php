@@ -17,3 +17,4 @@ if($createCategory !== false) {
     header('Location: /../category/index.php');
     exit();
 }
+
