@@ -1,17 +1,27 @@
 <?php
 require_once 'common/auth.php';
 require '../app/Tasks.php';
+require '../app/Categories.php';
 use App\Task;
+use App\Category;
 $pdo = new PDO('mysql:host=mysql;dbname=todo', 'root', 'password');
 
-$errorTaskDelete = "";
-if(isset($_SESSION['errorDeleteTask'])) {
+$errorTaskDelete = '';
+if (isset($_SESSION['errorDeleteTask'])) {
     $errorTaskDelete = $_SESSION['errorDeleteTask'];
     unset($_SESSION['errorDeleteTask']);
 }
 
+$categoryModel = new Category($pdo);
+$allCategories = $categoryModel->getCategories($userId);
+
+
 $taskModel = new Task($pdo);
-$allTasks = $taskModel->getTasks($userId);
+$searchKeyword = isset($_GET['contents']) ? $_GET['contents'] : '';
+$orderBy = isset($_GET['sort']) ? $_GET['sort'] : '';
+$categoryName = isset($_GET['categoryName']) ? $_GET['categoryName'] : '';
+$status = isset($_GET['status']) ? $_GET['status'] : '';
+$allTasks = $taskModel->searchTasks($userId, $searchKeyword, $orderBy, $categoryName, $status);
 
 ?>
 
@@ -30,38 +40,46 @@ $allTasks = $taskModel->getTasks($userId);
         <!-- 絞り込み -->
         <div>
             <h1>絞り込み機能</h1>
-            <form  action="" method="GET">
+            <form method="GET">
                 <div style="display: flex;">
-                    <input type="text" name="contents" placeholder="キーワードを入力">
+                    <input type="text" name="contents" placeholder="キーワードを入力" value="<?php echo htmlspecialchars(
+                        $searchKeyword,
+                        ENT_QUOTES,
+                        'UTF-8'
+                    ); ?>">
                     <div>
                         <div>
-                            <input type="radio" name="" id="newCreated">
+                            <input type="radio" name="sort" id="newCreated" value="new" <?php echo $orderBy === 'new' ? 'checked' : ''; ?>>
                             <label for="newCreated">新着順</label>
                         </div>
                         <div>
-                            <input type="radio" name="" id="oldCreated">
+                            <input type="radio" name="sort" id="oldCreated" value="old" <?php echo $orderBy === 'old' ? 'checked' : ''; ?>>
                             <label for="oldCreated">古い順</label>
                         </div>
                     </div>
                     <div>
-                        <select name="name" id="">
-                            <option value="" disabled selected style="display:none;">カテゴリ</option>
-                            <option value="">1</option>
+                        <select name="categoryName">
+                            <option value="" disabled selected>カテゴリを選んでください</option>
+                            <?php foreach ($allCategories as $category): ?>
+                            <option value="<?php echo htmlspecialchars($category['name'], ENT_QUOTES, 'UTF-8'); ?>" <?php echo $categoryName === $category['name'] ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($category['name'], ENT_QUOTES, 'UTF-8'); ?>
+                            </option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
                     <div>
                         <div>
-                            <input type="radio" name="" id="completed">
+                            <input type="radio" name="status" id="completed" value="1" <?php echo $status === '1' ? 'checked' : ''; ?>>
                             <label for="completed">完了</label>
                         </div>
                         <div>
-                            <input type="radio" name="" id="incomplete">
+                            <input type="radio" name="status" id="incomplete" value="0" <?php echo $status === '0' ? 'checked' : ''; ?>>
                             <label for="incomplete">未完了</label>
                         </div>
                     </div>
                 </div>
                 <div>
-                    <button type="submit" name="">Button</button>
+                    <button type="submit" name="search">検索</button>
                 </div>
             </form>
         </div>
@@ -81,34 +99,30 @@ $allTasks = $taskModel->getTasks($userId);
                 <th>編集</th>
                 <th>削除</th>
             </tr>
-            <?php foreach($allTasks as $allTask): ?>
+            <?php foreach ($allTasks as $task): ?>
                 <tr>
-                    <td><?php echo $allTask['contents'] ?></td>
-                    <td><?php echo $allTask['deadline'] ?></td>
-                    <td>
-                        <?
-                            $categoryId = $allTask['category_id'];
-                            $stmt = $pdo->prepare('SELECT name FROM categories WHERE id = :id');
-                            $stmt->execute([':id' => $categoryId]);
-                            $category = $stmt->fetch(PDO::FETCH_ASSOC);
-                            echo $category['name']; 
-                        ?>
-                    </td>
+                    <td><?php echo htmlspecialchars($task['contents'], ENT_QUOTES, 'UTF-8'); ?></td>
+                    <td><?php echo htmlspecialchars($task['deadline'], ENT_QUOTES, 'UTF-8'); ?></td>
+                    <td><?php echo htmlspecialchars($task['category_name'], ENT_QUOTES, 'UTF-8'); ?></td>
                     <td>
                         <form action="../process/task/updateStatus.php" method="POST">
-                            <input type="hidden" name="task_id" value="<?php echo $allTask['id']; ?>">
-                            <input type="hidden" name="status" value="<?php echo $allTask['status']; ?>">
+                            <input type="hidden" name="task_id" value="<?php echo $task['id']; ?>">
+                            <input type="hidden" name="status" value="<?php echo $task['status']; ?>">
                             <button type="submit" name="toggle_status">
-                                <?php echo ($allTask['status'] == 1) ? '完了' : '未完了'; ?>
+                                <?php echo $task['status'] == 1 ? '完了' : '未完了'; ?>
                             </button>
                         </form>
                     </td>
                     <td>
-                        <a href="task/edit.php?id=<?php echo $allTask['id']; ?>">編集</a>
+                        <a href="task/edit.php?id=<?php echo $task[
+                            'id'
+                        ]; ?>">編集</a>
                     </td>
                     <td>
                         <form action="../process/task/delete.php" method="POST">
-                            <input type="hidden" name="task_id" value="<?php echo $allTask['id']; ?>">
+                            <input type="hidden" name="task_id" value="<?php echo $task[
+                                'id'
+                            ]; ?>">
                             <button type="submit" name="delete">削除</button>
                         </form>
                     </td>
@@ -116,7 +130,7 @@ $allTasks = $taskModel->getTasks($userId);
             <?php endforeach; ?>
         </table>
         <div>
-            <?php echo $errorTaskDelete ?>
+            <?php echo $errorTaskDelete; ?>
         </div>
 
     </div>
