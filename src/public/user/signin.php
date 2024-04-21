@@ -1,5 +1,7 @@
 <?php
 session_start();
+$successRegistedMessage = $_SESSION['message'] ?? '';
+unset($_SESSION['message']);
 
 $success = "";
 if(isset($_SESSION['success'])) {
@@ -28,7 +30,9 @@ if(isset($_SESSION['errorMessage'])) {
             <h1>ログイン</h1>
         </div>
         <div>
-            <?php echo $success ?>
+            <p><?php echo $successRegistedMessage; ?></p>
+        </div>
+        <div>
             <?php echo $error ?>
         </div>
         <!-- form -->

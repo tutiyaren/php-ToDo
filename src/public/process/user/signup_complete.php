@@ -1,16 +1,52 @@
 <?php
-session_start();
+require_once __DIR__ . '/../../../vendor/autoload.php';
+use App\Infrastructure\Redirect\Redirect;
+use App\Domain\ValueObject\User\UserName;
+use App\Domain\ValueObject\Email;
+use App\Domain\ValueObject\InputPassword;
+use App\UseCase\UseCaseInput\SignUpInput;
+use App\UseCase\UseCaseInteractor\SignUpInteractor;
+use App\Adapter\User\UserMysqlCommand;
+use App\Adapter\User\UserMysqlQuery;
 
-use App\Signup;
-require '../../../app/Signup.php';
-$pdo = new PDO('mysql:host=mysql;dbname=todo', 'root', 'password');
+$name = filter_input(INPUT_POST, 'name');
+$email = filter_input(INPUT_POST, 'email');
+$password = filter_input(INPUT_POST, 'password');
+$confirmPassword = filter_input(INPUT_POST, 'confirmPassword');
 
-if($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $name = htmlspecialchars($_POST['name'], ENT_QUOTES);
-    $email = htmlspecialchars($_POST['email'], ENT_QUOTES);
-    $password = htmlspecialchars($_POST['password'], ENT_QUOTES);
-    $password_confirmation = htmlspecialchars($_POST['password_confirmation'], ENT_QUOTES);
+try {
+    session_start();
+    if(empty($password) || empty($confirmPassword)) {
+        throw new Exception('パスワードを入力してください');
+    }
+    if($password !== $confirmPassword) {
+        throw new Exception('パスワードが一致しません');
+    }
+    $userName = new UserName($name);
+    $userEmail = new Email($email);
+    $userPassword = new InputPassword($password);
+    $useCaseInput = new SignUpInput(
+        $userName,
+        $userEmail,
+        $userPassword
+    );
+    $userMysqlQuery = new UserMysqlQuery();
+    $userMysqlCommand = new UserMysqlCommand();
+    $useCase = new SignUpInteractor(
+        $useCaseInput,
+        $userMysqlQuery,
+        $userMysqlCommand
+    );
+    $useCaseOutput = $useCase->run();
 
-    $userModel = new Signup($pdo);
-    $userModel->createUser($name, $email, $password, $password_confirmation);
+    if(!$useCaseOutput->isSuccess()) {
+        throw new Exception('すでに登録済みのメールアドレスです');
+    }
+    $_SESSION['message'] = '登録が完了しました';
+    Redirect::hendler('/user/signin.php');
+} catch (Exception $e) {
+    $_SESSION['errors'][] = $e->getMessage();
+    $_SESSION['user']['name'] = $name;
+    $_SESSION['user']['email'] = $email;
+    Redirect::hendler('/user/signup.php');
 }
