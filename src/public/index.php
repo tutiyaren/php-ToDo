@@ -1,7 +1,16 @@
 <?php
-require_once 'common/auth.php';
+session_start();
+ob_start();
 require '../app/Tasks.php';
 use App\Task;
+
+
+if(!isset($_SESSION['id'])) {
+    header('Location: /user/signin.php');
+}
+$userId = $_SESSION['id'];
+
+
 $pdo = new PDO('mysql:host=mysql;dbname=todo', 'root', 'password');
 
 $errorTaskDelete = "";

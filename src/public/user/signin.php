@@ -3,17 +3,8 @@ session_start();
 $successRegistedMessage = $_SESSION['message'] ?? '';
 unset($_SESSION['message']);
 
-$success = "";
-if(isset($_SESSION['success'])) {
-    $success = $_SESSION['success'];
-    unset($_SESSION['success']);
-}
-
-$error = "";
-if(isset($_SESSION['errorMessage'])) {
-    $error = $_SESSION['errorMessage'];
-    unset($_SESSION['errorMessage']);
-}
+$errors = $_SESSION['errors'] ?? [];
+unset($_SESSION['errors']);
 
 ?>
 
@@ -32,9 +23,11 @@ if(isset($_SESSION['errorMessage'])) {
         <div>
             <p><?php echo $successRegistedMessage; ?></p>
         </div>
-        <div>
-            <?php echo $error ?>
-        </div>
+        <?php if (!empty($errors)): ?>
+            <?php foreach ($errors as $error): ?>
+                <p class="text-red-600"><?php echo $error; ?></p>
+            <?php endforeach; ?>
+        <?php endif; ?>
         <!-- form -->
         <form action="../process/user/signin_complete.php" method="post">
             <div>
