@@ -8,11 +8,8 @@ $categoryModel = new Category($pdo);
 $allCategories = $categoryModel->getCategories($userId);
 $categoryNames = "";
 
-$errorTaskAdd = "";
-if(isset($_SESSION['errorTaskAdd'])) {
-    $errorTaskAdd = $_SESSION['errorTaskAdd'];
-    unset($_SESSION['errorTaskAdd']);
-}
+$errors = $_SESSION['errors'] ?? [];
+unset($_SESSION['errors']);
 
 ?>
 
@@ -55,7 +52,9 @@ if(isset($_SESSION['errorTaskAdd'])) {
             </div>
         </form>
         <div>
-            <?php echo $errorTaskAdd ?>
+            <?php foreach ($errors as $error): ?>
+                <p><?php echo $error; ?></p>
+            <?php endforeach; ?>
         </div>
         <!-- ホームリンク -->
         <div>
