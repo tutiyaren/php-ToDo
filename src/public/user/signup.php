@@ -1,19 +1,7 @@
 <?php
 session_start();
-
-$error = "";
-if(isset($_SESSION['errorMessage'])) {
-    $error = $_SESSION['errorMessage'];
-    unset($_SESSION['errorMessage']);
-}
-if(isset($_SESSION['errorPassword'])) {
-    $error = $_SESSION['errorPassword'];
-    unset($_SESSION['errorPassword']);
-}
-if(isset($_SESSION['errorEmail'])) {
-    $error = $_SESSION['errorEmail'];
-    unset($_SESSION['errorEmail']);
-}
+$errors = $_SESSION['errors'] ?? [];
+unset($_SESSION['errors']);
 
 ?>
 
@@ -29,9 +17,9 @@ if(isset($_SESSION['errorEmail'])) {
         <div>
             <h1>会員登録</h1>
         </div>
-        <div>
-            <?php echo $error ?>
-        </div>
+        <?php foreach ($errors as $error): ?>
+            <p><?php echo $error; ?></p>
+        <?php endforeach; ?>
         <!-- form -->
         <form action="../process/user/signup_complete.php" method="post">
             <div>
@@ -44,7 +32,7 @@ if(isset($_SESSION['errorEmail'])) {
                 <input type="password" name="password" placeholder="Password">
             </div>
             <div>
-                <input type="password" name="password_confirmation" placeholder="Password確認用">
+                <input type="password" name="confirmPassword" placeholder="Password確認用">
             </div>
             <div>
                 <button type="submit">アカウント作成</button>
