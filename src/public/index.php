@@ -1,5 +1,17 @@
 <?php
 require_once 'common/auth.php';
+require '../app/Tasks.php';
+use App\Task;
+$pdo = new PDO('mysql:host=mysql;dbname=todo', 'root', 'password');
+
+$errorTaskDelete = "";
+if(isset($_SESSION['errorDeleteTask'])) {
+    $errorTaskDelete = $_SESSION['errorDeleteTask'];
+    unset($_SESSION['errorDeleteTask']);
+}
+
+$taskModel = new Task($pdo);
+$allTasks = $taskModel->getTasks($userId);
 
 ?>
 
@@ -56,7 +68,7 @@ require_once 'common/auth.php';
 
         <!-- タスク追加 -->
         <div>
-            <a href="task/create.php">タスクを追加</a>
+            <a href="/task/create.php">タスクを追加</a>
         </div>
 
         <!-- タスク一覧 -->
@@ -69,26 +81,43 @@ require_once 'common/auth.php';
                 <th>編集</th>
                 <th>削除</th>
             </tr>
-            <!-- foreach -->
-            <tr>
-                <td>タスクA</td>
-                <td>2024-12-30</td>
-                <td>カテゴリー1</td>
-                <td>
-                    <form action="../process/task/updateStatus.php" method="POST">
-                        <button type="submit" name="">完了 or 未完了</button>
-                    </form>
-                </td>
-                <td>
-                    <a href="task/edit.php">編集</a>
-                </td>
-                <td>
-                    <form action="../process/task/delete.php" method="POST">
-                        <button type="submit" name="">削除</button>
-                    </form>
-                </td>
-            </tr>
+            <?php foreach($allTasks as $allTask): ?>
+                <tr>
+                    <td><?php echo $allTask['contents'] ?></td>
+                    <td><?php echo $allTask['deadline'] ?></td>
+                    <td>
+                        <?
+                            $categoryId = $allTask['category_id'];
+                            $stmt = $pdo->prepare('SELECT name FROM categories WHERE id = :id');
+                            $stmt->execute([':id' => $categoryId]);
+                            $category = $stmt->fetch(PDO::FETCH_ASSOC);
+                            echo $category['name']; 
+                        ?>
+                    </td>
+                    <td>
+                        <form action="../process/task/updateStatus.php" method="POST">
+                            <input type="hidden" name="task_id" value="<?php echo $allTask['id']; ?>">
+                            <input type="hidden" name="status" value="<?php echo $allTask['status']; ?>">
+                            <button type="submit" name="toggle_status">
+                                <?php echo ($allTask['status'] == 1) ? '完了' : '未完了'; ?>
+                            </button>
+                        </form>
+                    </td>
+                    <td>
+                        <a href="task/edit.php?id=<?php echo $allTask['id']; ?>">編集</a>
+                    </td>
+                    <td>
+                        <form action="../process/task/delete.php" method="POST">
+                            <input type="hidden" name="task_id" value="<?php echo $allTask['id']; ?>">
+                            <button type="submit" name="delete">削除</button>
+                        </form>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
         </table>
+        <div>
+            <?php echo $errorTaskDelete ?>
+        </div>
 
     </div>
     

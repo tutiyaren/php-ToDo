@@ -1,5 +1,18 @@
 <?php
 require_once '../common/auth.php';
+require '../../app/Categories.php';
+use App\Category;
+$pdo = new PDO('mysql:host=mysql;dbname=todo', 'root', 'password');
+
+$categoryModel = new Category($pdo);
+$allCategories = $categoryModel->getCategories($userId);
+$categoryNames = "";
+
+$errorTaskAdd = "";
+if(isset($_SESSION['errorTaskAdd'])) {
+    $errorTaskAdd = $_SESSION['errorTaskAdd'];
+    unset($_SESSION['errorTaskAdd']);
+}
 
 ?>
 
@@ -22,21 +35,28 @@ require_once '../common/auth.php';
         <!-- タスク追加 -->
         <form action="../../process/task/store.php" method="POST" style="display: flex;">
             <div>
-                <select name="name" id="">
-                    <option value="" disabled selected style="display:none;">カテゴリを選んでください</option>
-                    <option value="">カテゴリ1</option>
+                <select name="categoryName">
+                    <option disabled selected style="display:none;">カテゴリを選んでください</option>
+                    <?php foreach($allCategories as $allCategory): ?>
+                    <option>
+                        <?php echo $allCategory['name'] ?>
+                    </option>
+                    <?php endforeach; ?>
                 </select>
             </div>
             <div>
                 <input type="text" name="contents" placeholder="タスクを追加">
             </div>
             <div>
-                <input type="date">
+                <input type="date" name="deadline" min="<?php echo date('Y-m-d'); ?>">
             </div>
             <div>
-                <button type="submit" name="">追加</button>
+                <button type="submit" name="create">追加</button>
             </div>
         </form>
+        <div>
+            <?php echo $errorTaskAdd ?>
+        </div>
         <!-- ホームリンク -->
         <div>
             <a href="../index.php">戻る</a>
