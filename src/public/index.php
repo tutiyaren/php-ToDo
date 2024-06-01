@@ -13,7 +13,6 @@ if(!isset($_SESSION['id'])) {
 $userId = $_SESSION['id'];
 
 
-
 use App\Category;
 $pdo = new PDO('mysql:host=mysql;dbname=todo', 'root', 'password');
 

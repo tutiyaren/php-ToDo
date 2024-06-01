@@ -1,14 +1,17 @@
 <?php
-require_once '../common/auth.php';
+session_start();
+ob_start();
 require '../../app/Categories.php';
 use App\Category;
 $pdo = new PDO('mysql:host=mysql;dbname=todo', 'root', 'password');
 
-$errorCategoryAdd = "";
-if(isset($_SESSION['errorCategoryAdd'])) {
-    $errorCategoryAdd = $_SESSION['errorCategoryAdd'];
-    unset($_SESSION['errorCategoryAdd']);
+if(!isset($_SESSION['id'])) {
+    header('Location: /user/signin.php');
 }
+$userId = $_SESSION['id'];
+$errors = $_SESSION['errors'] ?? [];
+unset($_SESSION['errors']);
+
 
 $errorCategoryDelete = "";
 if(isset($_SESSION['errorDeleteCategory'])) {
@@ -39,7 +42,11 @@ $allCategories = $categoryModel->getCategories($userId);
             <h1>カテゴリ一覧</h1>
         </div>
         <!-- カテゴリ追加 -->
-        <?php echo $errorCategoryAdd ?>
+        <div>
+            <?php foreach ($errors as $error): ?>
+                <p><?php echo $error; ?></p>
+            <?php endforeach; ?>
+        </div>
         <form action="../process/category/store.php" method="POST">
             <input type="text" name="name" placeholder="カテゴリー追加">
             <button type="submit" name="">登録</button>

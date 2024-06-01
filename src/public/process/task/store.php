@@ -1,27 +1,75 @@
 <?php
-session_start();
-
-use App\Task;
-require '../../../app/Tasks.php';
-$pdo = new PDO('mysql:host=mysql;dbname=todo', 'root', 'password');
-
-if(empty($_POST['categoryName']) || empty($_POST['contents']) || empty($_POST['deadline'])) {
-    Task::validateTask();
-}
+require_once __DIR__ . '/../../../vendor/autoload.php';
+use App\Infrastructure\Redirect\Redirect;
+use App\Domain\ValueObject\Task\TaskUserId;
+use App\Domain\ValueObject\Task\TaskCategoryId;
+use App\Domain\ValueObject\Task\TaskStatus;
+use App\Domain\ValueObject\Task\TaskDeadline;
+use App\Domain\ValueObject\Task\TaskContents;
+use App\UseCase\UseCaseInput\CreateTaskInput;
+use App\UseCase\UseCaseInteractor\CreateTaskInteractor;
+use APp\UseCase\UseCaseOutput\CreateTaskOutput;
+use App\Adapter\Task\TaskMysqlCommand;
+use App\Adapter\Task\TaskMysqlQuery;
 
 $categoryName = $_POST['categoryName'];
 $stmt = $pdo->prepare('SELECT id FROM categories WHERE name = :name');
 $stmt->execute([':name' => $categoryName]);
 $category = $stmt->fetch(PDO::FETCH_ASSOC);
-$categoryId = $category['id'];
-
-$userId = $_SESSION['id'];
+$categoryName = filter_input(INPUT_POST, 'categoryName');
+$deadline = filter_input(INPUT_POST, 'deadline');
+$contents = filter_input(INPUT_POST, 'contents');
 $status = 0;
-$contents = $_POST['contents'];
-$deadline = $_POST['deadline'];
-$taskModel = new Task($pdo);
-$createTask = $taskModel->addTask($userId, $categoryId, $status, $contents, $deadline);
-if($createTask !== false) {
-    header('Location: /../index.php');
-    exit();
+
+try {
+    session_start();
+    if(empty($contents) || empty($categoryName) || empty($deadline)) {
+        throw new Exception('タスク名、カテゴリー、日付を入力して');
+    }
+    $user_id = $_SESSION['id'];
+    $category_id = $category['id'];
+    $taskUserId = new TaskUserId($user_id);
+    $taskCategoryId = new TaskCategoryId($category_id);
+    $deadline = new TaskDeadline($taskDeadline);
+    $contents = new TaskContents($taskContents);
+    $status = new TaskStatus($taskStatus);
+    $useCaseInput = new CreateTaskInput($taskUserId, $taskCategoryId, $taskDeadline, $taskContents, $taskStatus);
+    $taskMysqlQuery = new TaskMysqlQuery();
+    $taskMysqlCommand = new TaskMysqlCommand();
+    $useCase = new CreateTaskInteractor($useCaseInput, $taskMysqlQuery, $taskMysqlCommand);
+    $useCaseOutput = $useCase->run();
+
+    if(!$useCaseOutput->isSuccess()) {
+        throw new Exception($useCaseOutput->message());
+    }
+    $_SESSION['message'] = $useCaseOutput->message();
+    Redirect::hendler('/index.php');
+} catch(Exception $e) {
+    $_SESSION['errors'][] = $e->getMessage();
+    $_SESSION['contents'] = $contents;
+    Redirect::hendler('/task/create.php');
 }
+
+// session_start();
+// use App\Task;
+// require '../../../app/Tasks.php';
+// $pdo = new PDO('mysql:host=mysql;dbname=todo', 'root', 'password');
+// if(empty($_POST['categoryName']) || empty($_POST['contents']) || empty($_POST['deadline'])) {
+//     Task::validateTask();
+// }
+// $categoryName = $_POST['categoryName'];
+// $stmt = $pdo->prepare('SELECT id FROM categories WHERE name = :name');
+// $stmt->execute([':name' => $categoryName]);
+// $category = $stmt->fetch(PDO::FETCH_ASSOC);
+// $categoryId = $category['id'];
+
+// $userId = $_SESSION['id'];
+// $status = 0;
+// $contents = $_POST['contents'];
+// $deadline = $_POST['deadline'];
+// $taskModel = new Task($pdo);
+// $createTask = $taskModel->addTask($userId, $categoryId, $status, $contents, $deadline);
+// if($createTask !== false) {
+//     header('Location: /../index.php');
+//     exit();
+// }
