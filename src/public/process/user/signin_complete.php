@@ -1,17 +1,39 @@
 <?php
-session_start();
+require_once __DIR__ . '/../../../vendor/autoload.php';
+use App\Infrastructure\Redirect\Redirect;
+use App\Domain\ValueObject\Email;
+use App\Domain\ValueObject\InputPassword;
+use App\UseCase\UseCaseInput\SignInInput;
+use App\UseCase\UseCaseInteractor\SignInInteractor;
+use App\Adapter\User\UserMysqlCommand;
+use App\Adapter\User\UserMysqlQuery;
 
-use App\Signin;
-require '../../../app/Signin.php';
-$pdo = new PDO('mysql:host=mysql;dbname=todo', 'root', 'password');
+$email = filter_input(INPUT_POST, 'email');
+$password  = filter_input(INPUT_POST, 'password');
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $email = htmlspecialchars($_POST['email'], ENT_QUOTES);
-    $password = htmlspecialchars($_POST['password'], ENT_QUOTES);
+try {
+    session_start();
+    if(empty($email) || empty($password)) {
+        throw new Exception('パスワードとメールアドレスを入力してください');
+    }
+    $userEmail = new Email($email);
+    $inputPassword = new InputPassword($password);
+    $useCaseInput = new SignInInput($userEmail, $inputPassword);
+    $userMysqlQuery = new UserMysqlQuery();
+    $userMysqlCommand = new UserMysqlCommand();
+    $useCase = new SignInInteractor($useCaseInput, $userMysqlQuery, $userMysqlCommand);
+    $useCaseOutput = $useCase->run();
 
-    $userModel = new Signin($pdo);
-    $userModel->item($email, $password);
-    $user = $userModel->getUserByEmail($email);
-    $userModel->validateUserLogin($user, $password);
-    $error = isset($_SESSION['errorMessage']) ? $_SESSION['errorMessage'] : '';
+    if (!$useCaseOutput->isSuccess()) {
+        throw new Exception(
+            'メールアドレスまたは<br />パスワードが間違っています'
+        );
+    }
+    
+    $userId = $userMysqlQuery->findByEmail($userEmail)->id()->value();
+    $_SESSION['id'] = $userId; 
+    Redirect::hendler('../../index.php');
+} catch (Exception $e) {
+    $_SESSION['errors'][] = $e->getMessage();
+    Redirect::hendler('/user/signin.php');
 }
