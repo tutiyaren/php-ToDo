@@ -1,4 +1,7 @@
+<?php
+require_once '../common/auth.php';
 
+?>
 
 <!DOCTYPE html>
 <html lang="ja">

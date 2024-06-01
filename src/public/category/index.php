@@ -1,4 +1,7 @@
+<?php
+require_once '../common/auth.php';
 
+?>
 
 <!DOCTYPE html>
 <html lang="ja">
@@ -16,7 +19,7 @@
             <h1>カテゴリ一覧</h1>
         </div>
         <!-- カテゴリ追加 -->
-        <form action="../../process/category/store.php" method="POST">
+        <form action="../process/category/store.php" method="POST">
             <input type="text" name="name" placeholder="カテゴリー追加">
             <button type="submit" name="">登録</button>
         </form>

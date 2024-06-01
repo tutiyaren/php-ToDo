@@ -1,4 +1,19 @@
+<?php
+session_start();
 
+$success = "";
+if(isset($_SESSION['success'])) {
+    $success = $_SESSION['success'];
+    unset($_SESSION['success']);
+}
+
+$error = "";
+if(isset($_SESSION['errorMessage'])) {
+    $error = $_SESSION['errorMessage'];
+    unset($_SESSION['errorMessage']);
+}
+
+?>
 
 <!DOCTYPE html>
 <html lang="ja">
@@ -13,11 +28,11 @@
             <h1>ログイン</h1>
         </div>
         <div>
-            <!-- <?php echo $success ?>
-            <?php echo $error ?>  -->
+            <?php echo $success ?>
+            <?php echo $error ?>
         </div>
         <!-- form -->
-        <form action="../../process/user/signin_complete.php" method="post">
+        <form action="../process/user/signin_complete.php" method="post">
             <div>
                 <input type="email" name="email" placeholder="Email">
             </div>

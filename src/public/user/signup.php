@@ -1,5 +1,21 @@
+<?php
+session_start();
 
+$error = "";
+if(isset($_SESSION['errorMessage'])) {
+    $error = $_SESSION['errorMessage'];
+    unset($_SESSION['errorMessage']);
+}
+if(isset($_SESSION['errorPassword'])) {
+    $error = $_SESSION['errorPassword'];
+    unset($_SESSION['errorPassword']);
+}
+if(isset($_SESSION['errorEmail'])) {
+    $error = $_SESSION['errorEmail'];
+    unset($_SESSION['errorEmail']);
+}
 
+?>
 
 <!DOCTYPE html>
 <html lang="ja">
@@ -14,10 +30,10 @@
             <h1>会員登録</h1>
         </div>
         <div>
-            <!-- <?php echo $error ?> -->
+            <?php echo $error ?>
         </div>
         <!-- form -->
-        <form action="../../process/user/signup_complete.php" method="post">
+        <form action="../process/user/signup_complete.php" method="post">
             <div>
                 <input type="text" name="name" placeholder="User name">
             </div>
