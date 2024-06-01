@@ -5,7 +5,13 @@ use PDO;
 interface taskInterface
 {
     public static function validateTask();
-    public function addTask($userId, $categoryId, $status, $contents, $deadline): void;
+    public function addTask(
+        $userId,
+        $categoryId,
+        $status,
+        $contents,
+        $deadline
+    ): void;
     public function getTasks($userId);
     public function toggleStatus($newStatus, $taskId);
     public function deleteTask($task_id);
@@ -27,30 +33,37 @@ class Task extends AbstractTask
 {
     public static function validateTask()
     {
-        if(empty($_POST['categoryName'])) {
+        if (empty($_POST['categoryName'])) {
             $_SESSION['errorTaskAdd'] = 'カテゴリが選択されていません';
             header('Location: /task/create.php');
             exit();
         }
-        if(empty($_POST['contents'])) {
+        if (empty($_POST['contents'])) {
             $_SESSION['errorTaskAdd'] = 'タスク名が入力されていません';
             header('Location: /task/create.php');
             exit();
         }
-        if(empty($_POST['deadline'])) {
+        if (empty($_POST['deadline'])) {
             $_SESSION['errorTaskAdd'] = '締切日が入力選択されていません';
             header('Location: /task/create.php');
             exit();
         }
     }
 
-    public function addTask($userId, $categoryId, $status, $contents, $deadline): void
-    {
+    public function addTask(
+        $userId,
+        $categoryId,
+        $status,
+        $contents,
+        $deadline
+    ): void {
         date_default_timezone_set('Asia/Tokyo');
-        $created_at = date("Y-m-d H:i:s");
-        $updated_at = date("Y-m-d H:i:s");
+        $created_at = date('Y-m-d H:i:s');
+        $updated_at = date('Y-m-d H:i:s');
 
-        $smt = $this->pdo->prepare('INSERT INTO tasks(user_id, category_id, status, contents, deadline, created_at, updated_at) VALUES(:user_id, :category_id, :status, :contents, :deadline, :created_at, :updated_at)');
+        $smt = $this->pdo->prepare(
+            'INSERT INTO tasks(user_id, category_id, status, contents, deadline, created_at, updated_at) VALUES(:user_id, :category_id, :status, :contents, :deadline, :created_at, :updated_at)'
+        );
         $smt->bindParam(':user_id', $userId);
         $smt->bindParam(':category_id', $categoryId);
         $smt->bindParam(':status', $status);
@@ -63,14 +76,18 @@ class Task extends AbstractTask
 
     public function getTasks($userId)
     {
-        $smt = $this->pdo->prepare('SELECT * FROM tasks WHERE user_id = :user_id');
+        $smt = $this->pdo->prepare(
+            'SELECT * FROM tasks WHERE user_id = :user_id'
+        );
         $smt->execute([':user_id' => $userId]);
         return $smt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function toggleStatus($newStatus, $taskId)
     {
-        $stmt = $this->pdo->prepare('UPDATE tasks SET status = :status WHERE id = :id');
+        $stmt = $this->pdo->prepare(
+            'UPDATE tasks SET status = :status WHERE id = :id'
+        );
         $stmt->execute([':status' => $newStatus, ':id' => $taskId]);
         header('Location: /index.php');
         exit();
@@ -79,7 +96,7 @@ class Task extends AbstractTask
     public function deleteTask($task_id)
     {
         $smt = $this->pdo->prepare('DELETE FROM tasks WHERE id = :id');
-        $smt->execute(array(':id' => $task_id));
+        $smt->execute([':id' => $task_id]);
     }
 
     public function getTask($taskId)
@@ -92,7 +109,45 @@ class Task extends AbstractTask
 
     public function updateTask($task_id, $category_id, $contents, $deadline)
     {
-        $smt = $this->pdo->prepare('UPDATE tasks SET category_id = :category_id, contents = :contents, deadline = :deadline WHERE id = :id');
-        $smt->execute(array(':id' => $task_id, ':category_id' => $category_id, ':contents' => $contents, ':deadline' => $deadline));
+        $smt = $this->pdo->prepare(
+            'UPDATE tasks SET category_id = :category_id, contents = :contents, deadline = :deadline WHERE id = :id'
+        );
+        $smt->execute([
+            ':id' => $task_id,
+            ':category_id' => $category_id,
+            ':contents' => $contents,
+            ':deadline' => $deadline,
+        ]);
+    }
+
+    public function searchTasks($userId, $searchKeyword, $orderBy, $categoryName, $status) 
+    {
+        $sql = 'SELECT tasks.*, categories.name as category_name FROM tasks LEFT JOIN categories ON tasks.category_id = categories.id WHERE tasks.user_id = :user_id';
+        $params = [':user_id' => $userId];
+
+        if (!empty($searchKeyword)) {
+            $sql .= ' AND contents LIKE :searchKeyword';
+            $params[':searchKeyword'] = '%' . $searchKeyword . '%';
+        }
+        if ($status !== '') {
+            $sql .= ' AND status = :status';
+            $params[':status'] = $status;
+        }
+
+        if (!empty($orderBy)) {
+            if ($orderBy === 'old') {
+                $sql .= ' ORDER BY tasks.created_at ASC';
+            } elseif ($orderBy === 'new') {
+                $sql .= ' ORDER BY tasks.created_at DESC';
+            }
+        }
+        if (!empty($categoryName)) {
+            $sql .= ' AND categories.name = :categoryName';
+            $params[':categoryName'] = $categoryName;
+        }
+        
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
