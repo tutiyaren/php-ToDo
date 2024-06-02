@@ -1,6 +1,6 @@
 <?php
 namespace App\Domain\ValueObject\Task;
-require_once __DIR__ . '/../../../vendor/autoload.php';
+require_once __DIR__ . '/../../../../vendor/autoload.php';
 use App\Domain\ValueObject\Task\TaskUserId;
 use App\Domain\ValueObject\Task\TaskCategoryId;
 use App\Domain\ValueObject\Task\TaskStatus;
