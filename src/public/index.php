@@ -41,6 +41,7 @@ $allTasks = $taskModel->searchTasks($userId, $searchKeyword, $orderBy, $category
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ToDoアプリ</title>
+  <link rel="stylesheet" href="./css/click.css">
 </head>
 <body>
 
@@ -110,7 +111,7 @@ $allTasks = $taskModel->searchTasks($userId, $searchKeyword, $orderBy, $category
                 <th>削除</th>
             </tr>
             <?php foreach ($allTasks as $task): ?>
-                <tr>
+                <tr class="task-list">
                     <td><?php echo htmlspecialchars($task['contents'], ENT_QUOTES, 'UTF-8'); ?></td>
                     <td><?php echo htmlspecialchars($task['deadline'], ENT_QUOTES, 'UTF-8'); ?></td>
                     <td><?php echo htmlspecialchars($task['category_name'], ENT_QUOTES, 'UTF-8'); ?></td>
@@ -145,5 +146,6 @@ $allTasks = $taskModel->searchTasks($userId, $searchKeyword, $orderBy, $category
 
     </div>
     
+<script src="./js/click.js"></script>
 </body>
 </html>
