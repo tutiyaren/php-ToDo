@@ -1,0 +1,84 @@
+.open-modal {
+  cursor: pointer;
+}
+.open-modal:hover {
+  color: red;
+  font-weight: bold;
+}
+
+.dialog::backdrop {
+  background: rgba(254, 248, 129, 0.202);
+  backdrop-filter: blur(2px);
+}
+
+body.is_modal {
+  overflow: hidden;
+}
+
+.dialog {
+  padding: 0;
+  width: 40%;
+  border-radius: 10px;
+  border: none;
+}
+.dialog-inner {
+  padding: 6% 0;
+  text-align: center;
+  background-color: rgba(254, 248, 129, 0.562);
+}
+.form {
+  display: flex;
+  flex-direction: column;
+}
+.input {
+  width: 80%;
+  margin: 0 auto 5%;
+  padding: 3% 4%;
+  letter-spacing: 3px;
+  background-color: rgba(254, 248, 129, 0.329);
+}
+.button {
+  width: 40%;
+  text-align: center;
+  margin: 0 auto;
+  padding: 2% 0;
+  background-color: rgba(254, 248, 129, 0.329);
+  border: none;
+  cursor: pointer;
+
+  position: relative;
+  z-index: 1;
+  display: block;
+  overflow: hidden;
+  transition: .5s;
+}
+.button::before,
+.button::after {
+  content: "";
+  width: 100%;
+  position: absolute;
+  top: 0;
+  z-index: -1;
+  transition: transform ease .3s;
+}
+.button::before {
+  right: -60px;
+  border-right: 60px solid transparent;
+  border-bottom: 60px solid #fff;
+  transform: translateX(-100%);
+}
+.button::after {
+  left: -60px;
+  border-left: 60px solid transparent;
+  border-top: 60px solid #333;
+  transform: translateX(100%);
+}
+.button:hover {
+  color: gray;
+}
+.button:hover::before {
+  transform: translateX(-44%);
+}
+.button:hover::after {
+  transform: translateX(54%);
+}

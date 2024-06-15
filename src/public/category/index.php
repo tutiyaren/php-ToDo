@@ -32,6 +32,7 @@ $allCategories = $categoryModel->getCategories($userId);
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ToDoアプリ</title>
+  <link rel="stylesheet" href="../css/modal.css">
 </head>
 <body>
 
@@ -42,15 +43,20 @@ $allCategories = $categoryModel->getCategories($userId);
             <h1>カテゴリ一覧</h1>
         </div>
         <!-- カテゴリ追加 -->
+        <p class="open-modal">カテゴリを追加する</p>
         <div>
             <?php foreach ($errors as $error): ?>
                 <p><?php echo $error; ?></p>
             <?php endforeach; ?>
         </div>
-        <form action="../process/category/store.php" method="POST">
-            <input type="text" name="name" placeholder="カテゴリー追加">
-            <button type="submit" name="">登録</button>
-        </form>
+        <dialog class="dialog">
+            <div class="dialog-inner">
+                <form class="form" action="../process/category/store.php" method="POST">
+                    <input class="input" type="text" name="name" placeholder="カテゴリー追加">
+                    <button class="button" type="submit">登録</button>
+                </form>
+            </div>
+        </dialog>
 
         <!-- カテゴリー一覧 -->
         <div>
@@ -80,6 +86,8 @@ $allCategories = $categoryModel->getCategories($userId);
             <a href="../task/create.php">戻る</a>
         </div>
     </div>
+
+    <script src="../js/modal.js"></script>
     
 </body>
 </html>
