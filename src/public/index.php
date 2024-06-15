@@ -41,6 +41,7 @@ $allTasks = $taskModel->searchTasks($userId, $searchKeyword, $orderBy, $category
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ToDoアプリ</title>
   <link rel="stylesheet" href="./css/click.css">
+  <link rel="stylesheet" href="./css/scroll.css">
 </head>
 <body>
 
@@ -142,9 +143,11 @@ $allTasks = $taskModel->searchTasks($userId, $searchKeyword, $orderBy, $category
         <div>
             <?php echo $errorTaskDelete; ?>
         </div>
+        <p class="scroll-message">一番下まで行きました</p>
 
     </div>
     
 <script src="./js/click.js"></script>
+<script src="./js/scroll.js"></script>
 </body>
 </html>
